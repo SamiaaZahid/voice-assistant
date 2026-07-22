@@ -101,7 +101,7 @@ async function respond(text) {
     "open youtube": ["Opening YouTube.", "https://www.youtube.com"],
     "open instagram": ["Opening Instagram.", "https://www.instagram.com"],
     "open whatsapp": ["Opening WhatsApp Web.", "https://web.whatsapp.com"],
-    "open chatgpt": ["Opening ChatGPT.", "https://chat.openai.com"]
+    "open chatgpt": ["Opening ChatGPT.", "https://chat.openai.com"],
     "open snapchat": ["Opening SnapChat.", "https://www.snapchat.com"]
   };
   for (const key in sites) {
