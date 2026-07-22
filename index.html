@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SIA — Voice Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="app">
+
+  <header class="masthead">
+    <span class="dial"></span>
+    <div class="titles">
+      <h1>SIA</h1>
+    </div>
+  </header>
+
+  <button class="mic" id="micBtn" onclick="startListening()" aria-label="Speak">
+    <svg class="mic-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="9" y="2" width="6" height="12" rx="3" stroke="currentColor" stroke-width="1.6"/>
+      <path d="M5 11a7 7 0 0 0 14 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      <path d="M12 18v3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+    </svg>
+  </button>
+
+  <div class="wave-container" id="waveContainer">
+    <div class="orb">
+      <span class="orb-core"></span>
+      <span class="blob blob-a"></span>
+      <span class="blob blob-b"></span>
+      <span class="blob blob-c"></span>
+    </div>
+  </div>
+
+  <div class="screen">
+    <div class="line user-line">
+      <span class="tag">You</span>
+      <p id="userText">—</p>
+    </div>
+    <div class="line bot-line">
+      <span class="tag">SIA</span>
+      <p id="botReply">—</p>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
