@@ -1,13 +1,11 @@
 // ==========================================================
-// CONFIG — put your Gemini API key here
-// Get a key at: https://aistudio.google.com/apikey
+// CONFIG — Proxy Worker URL
 // ==========================================================
 const CONFIG = {
-  GEMINI_API_KEY: "AQ.Ab8RN6JESqpUxz1hV_nUyw10VktFWc9a7dyS81H4_4U_YL4VgQ",
-  GEMINI_MODEL: "gemini-2.5-flash"
+  WORKER_URL: "https://geminiproxy.samiaazahid01.workers.dev" 
 };
 
-// Internal status tracker only — not shown in the UI anywhere.
+// Internal status tracker only
 let currentStatus = "Ready";
 
 const userTextEl = document.getElementById("userText");
@@ -17,7 +15,6 @@ const waveContainer = document.getElementById("waveContainer");
 
 // ==========================================================
 // Voices — cache them and pick a female voice for replies
-// (voice list loads asynchronously in most browsers)
 // ==========================================================
 let cachedVoices = [];
 function loadVoices() {
@@ -76,45 +73,36 @@ function startListening() {
 }
 
 function setStatus(text) {
-  // Kept for internal state tracking; not shown in the UI.
   currentStatus = text;
 }
 
 // ==========================================================
 // MAIN RESPONSE FUNCTION
-// A few fixed/instant commands are checked first (fast, no
-// API call needed). Everything else goes to the Gemini API,
-// which replies in whatever language the user spoke.
 // ==========================================================
 async function respond(text) {
   const lower = text.toLowerCase();
 
-  // Creator question — instant, fixed answer (English fast-path).
-  // Other languages fall through to Gemini, which is instructed
-  // to give the same answer in the user's own language.
   if (lower.includes("who created you") || lower.includes("who made you")) {
     return finishTurn("I was created by Samia.");
   }
 
-  // Time
   if (lower.includes("time")) {
     const now = new Date();
     const t = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
     return finishTurn("The current time is " + t);
   }
 
-  // Date
   if (lower.includes("date")) {
     return finishTurn("Today's date is " + new Date().toDateString());
   }
 
-  // Open websites
   const sites = {
     "open google": ["Opening Google.", "https://www.google.com"],
     "open youtube": ["Opening YouTube.", "https://www.youtube.com"],
     "open instagram": ["Opening Instagram.", "https://www.instagram.com"],
     "open whatsapp": ["Opening WhatsApp Web.", "https://web.whatsapp.com"],
     "open chatgpt": ["Opening ChatGPT.", "https://chat.openai.com"]
+    "open snapchat": ["Opening SnapChat.", "https://www.snapchat.com"]
   };
   for (const key in sites) {
     if (lower.includes(key)) {
@@ -131,21 +119,18 @@ async function respond(text) {
     return finishTurn("You're welcome!");
   }
 
-  // Everything else — ask Gemini
   setStatus("Thinking...");
   const reply = await askGemini(text);
   finishTurn(reply);
 }
 
 // ==========================================================
-// GEMINI API CALL
+// GEMINI API CALL (VIA CLOUDFLARE PROXY)
 // ==========================================================
 async function askGemini(userText) {
-  if (!CONFIG.GEMINI_API_KEY || CONFIG.GEMINI_API_KEY === "YOUR_GEMINI_API_KEY_HERE") {
-    return "No API key set. Add your Gemini API key in CONFIG.GEMINI_API_KEY inside script.js.";
+  if (!CONFIG.WORKER_URL) {
+    return "Worker URL missing.";
   }
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.GEMINI_MODEL}:generateContent?key=${CONFIG.GEMINI_API_KEY}`;
 
   const body = {
     system_instruction: {
@@ -163,34 +148,28 @@ async function askGemini(userText) {
   };
 
   try {
-    const res = await fetch(url, {
+    const res = await fetch(CONFIG.WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body)
     });
 
     if (!res.ok) {
-      const errData = await res.json().catch(() => null);
-      console.error("Gemini API error:", errData);
-      if (res.status === 400) return "The API key or request looks invalid. Please check it.";
-      if (res.status === 403) return "This API key doesn't have permission. Check it in Google AI Studio.";
-      if (res.status === 429) return "Too many requests right now, please try again shortly.";
-      return "Something went wrong. Please try again.";
+      console.error("Worker/Gemini API error:", res.status);
+      return "Something went wrong with the proxy worker. Please try again.";
     }
 
     const data = await res.json();
     const reply = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     return reply ? reply.trim() : "Sorry, I couldn't get a reply.";
   } catch (err) {
-    console.error("Network/Gemini error:", err);
+    console.error("Network/Proxy error:", err);
     return "There seems to be a connection problem.";
   }
 }
 
 // ==========================================================
 // SHOW + SPEAK
-// The orb only moves while audio is actually happening
-// (listening or speaking) and freezes the instant it stops.
 // ==========================================================
 function finishTurn(reply) {
   botReplyEl.textContent = reply;
