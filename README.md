@@ -6,11 +6,11 @@ A browser-based voice assistant with a live, morphing orb animation and Gemini A
 
 ## Features
 
-- 🎙️ Voice input using the Web Speech API
-- 🔊 Spoken replies with a female voice
-- 🌐 Answers any question via the Gemini API, in whatever language you ask
-- ⚡ Instant local commands (no API call needed) for time, date, and opening websites
-- 🫧 A liquid, morphing orb that moves while listening or speaking, and freezes when idle
+-  Voice input using the Web Speech API
+-  Spoken replies with a female voice
+-  Answers any question via the Gemini API, in whatever language you ask
+-  Instant local commands (no API call needed) for time, date, and opening websites
+-  A liquid, morphing orb that moves while listening or speaking, and freezes when idle
 
 ## Tech stack
 
